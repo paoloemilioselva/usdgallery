@@ -39,7 +39,7 @@ scenes_groups = {
         "ar_path":"C:/Users/paolo/Desktop/code/OpenPBRShaderPlayground",
         "scenes": {
             "openpbr-playground":{
-                "filepath":"ShdrPlygrnd/ShdrPlygrnd_OpenPBR.usda",
+                "filepath":"./custom_scenes/openpbr_playground.usda",
                 "camera":"renderCam_mainCU",
             },
         }

@@ -15,6 +15,8 @@ https://dpel.aswf.io/openpbr-shader-playground/
 
 ## How to use it
 
+### If you renderer supports usdrecord/Hydra
+
 Open a shell with OpenUSD and the renderer you want to use, navigate to the `usdgallery` folder and just call:
 
 ```
@@ -32,3 +34,15 @@ For the Karma renders, you can simply open the `Command Line Tools` shell from t
 ```
 hython render.py "Karma CPU"
 ```
+
+### If you renderer doesn't support usdrecord/Hydra
+
+Manually render into EXRs placed in the renders folder, matching the style of the other renderers.
+
+Then just launch the script without any other argument:
+
+```
+python render.py
+```
+
+The script will search for all the EXRs, convert them to preview JPG and update the gallery.md file.

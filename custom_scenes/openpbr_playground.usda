@@ -1,0 +1,32 @@
+#usda 1.0
+(
+    metersPerUnit = 1.0
+    upAxis = "Y"
+    subLayers = [
+        @ShdrPlygrnd/ShdrPlygrnd_OpenPBR.usda@,
+    ]
+)
+
+over "World"
+{
+    over "lightRig"
+    {
+        over "sun_screenRight" (
+            prepend apiSchemas = ["ShadowAPI"]
+        )
+        {
+        }
+
+        over "moonLight_screenLFT" (
+            prepend apiSchemas = ["ShadowAPI"]
+        )
+        {
+        }
+
+        over "LEDmeetMat" (
+            prepend apiSchemas = ["ShadowAPI"]
+        )
+        {
+        }
+    }
+}
