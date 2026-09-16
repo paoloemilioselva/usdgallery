@@ -51,10 +51,16 @@ purpose = "render"
 
 if len(sys.argv) > 1:
     renderer = sys.argv[1]
+    input_scene = ""
+    if len(sys.argv) > 2:
+        input_scene = sys.argv[2]
+
     for scene_group, scene_group_data in scenes_groups.items():
         custom_envs = os.environ.copy()
         custom_envs["PXR_AR_DEFAULT_SEARCH_PATH"] = scene_group_data["ar_path"]
         for scene_name, scene_data in scene_group_data["scenes"].items():
+            if input_scene != "" and input_scene != scene_name:
+                continue
             scene_file = scene_data["filepath"]
             output_folder = "{}/{}/{}".format(renders_folder, scene_group, scene_name, purpose)
             os.makedirs(output_folder, exist_ok=True)
@@ -78,36 +84,36 @@ if len(sys.argv) > 1:
             print(" ".join(usdrecord_args))
             subprocess.run(usdrecord_args, shell=True, env=custom_envs)
 
-            gallery_preview = "{}/{}_preview.jpg".format(output_folder, renderer)
-            ffmpeg_args = [
-                "ffmpeg",
-                "-y",
-                "-loglevel",
-                "error",
-                "-apply_trc",
-                "iec61966_2_1",
-                "-i",
-                render_output,
-                "-vf",
-                "scale=256:-1",
-                gallery_preview
-            ]
-            print(" ".join(ffmpeg_args))
-            subprocess.run(ffmpeg_args, shell=True)
-
 # update gallery
 renderers = []
 gallery = {}
 folder = Path('.')
-for file_path in folder.glob("**/*_preview.jpg"):
+for file_path in folder.glob("**/*.exr"):
     if len(file_path.parts) == 4:
         scene_group = file_path.parts[1]
         scene_name = file_path.parts[2]
-        renderer = str(file_path.parts[3]).replace("_preview.jpg","")
+        render_output = str(file_path)
+        renderer = str(file_path.parts[3]).replace(".exr","")
+        gallery_preview = render_output.replace(".exr","_preview.jpg")
+
+        ffmpeg_args = [
+            "ffmpeg",
+            "-y",
+            "-loglevel",
+            "error",
+            "-apply_trc",
+            "iec61966_2_1",
+            "-i",
+            render_output,
+            gallery_preview
+        ]
+        print(" ".join(ffmpeg_args))
+        subprocess.run(ffmpeg_args, shell=True)
+
         if scene_name not in gallery.keys():
             gallery[scene_name] = {}
         if renderer not in gallery[scene_name].keys():
-            gallery[scene_name][renderer] = str(file_path)
+            gallery[scene_name][renderer] = gallery_preview
         if renderer not in renderers:
             renderers.append(renderer)
 
@@ -127,7 +133,7 @@ for scene_name in gallery.keys():
     gallery_content += '|{}|'.format(scene_name)
     for renderer in renderers:
         if renderer in gallery[scene_name].keys():
-            gallery_content += '<img src="{}">|'.format(gallery[scene_name][renderer])
+            gallery_content += '<img src="{}" width="256">|'.format(gallery[scene_name][renderer])
         else:
             gallery_content += 'X|'
     gallery_content += "\n"
